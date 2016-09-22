@@ -1,11 +1,14 @@
 package com.example.sjors.sjors_witteveen_pset3;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +24,10 @@ public class MainActivity extends AppCompatActivity {
     URL url;
 
     EditText search_input;
-    TextView text;
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +35,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         search_input = (EditText) findViewById(R.id.search_input);
-        text = (TextView) findViewById(R.id.textView);
+        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        //mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mAdapter = new MyAdapter(new String[0]);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     public void onSearch(View view) throws IOException, JSONException {
@@ -45,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
     private class readJsonFromURL extends AsyncTask<Void, Void, Void> {
 
-        String Title;
+        JSONArray search;
+        String toast_string;
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -64,19 +82,40 @@ public class MainActivity extends AppCompatActivity {
             // build a JSON object
             try {
                 JSONObject obj = new JSONObject(str);
-                JSONArray search = obj.getJSONArray("Search");
-                JSONObject first_search = search.getJSONObject(0);
-                Title = first_search.getString("Title");
+                if (obj.getString("Response").equals("True")) {
+                    search = obj.getJSONArray("Search");
+                } else if (obj.getString("Response").equals("False")) {
+                    toast_string = obj.getString("Error");
+                }
             } catch (JSONException e) {
-                Title = "No results found";
+                e.printStackTrace();
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            text.setText(Title);
+
+            if (search != null) {
+                String[] titles = new String[10];
+                for (int i = 0; i < search.length(); i++) {
+                    try {
+                        JSONObject search_result = search.getJSONObject(i);
+                        titles[i] = search_result.getString("Title");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mAdapter = new MyAdapter(titles);
+                mRecyclerView.setAdapter(mAdapter);
+
+            } else {
+                    Toast.makeText(getApplicationContext(), toast_string,
+                            Toast.LENGTH_SHORT).show();
+            }
             super.onPostExecute(result);
         }
+
+
     }
 }

@@ -1,13 +1,15 @@
 package com.example.sjors.sjors_witteveen_pset3;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -21,13 +23,12 @@ import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
-    URL url;
+    Context context = this;
 
     EditText search_input;
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private ListView movie_list;
+    private String[][] searchResults = new String[10][5];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,18 +36,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         search_input = (EditText) findViewById(R.id.search_input);
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        movie_list = (ListView) findViewById(R.id.movie_list);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        //mRecyclerView.setHasFixedSize(true);
+        movie_list.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent,
+                                    View view, int position, long id) {
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        mAdapter = new MyAdapter(new String[0]);
-        mRecyclerView.setAdapter(mAdapter);
+                Intent moreInfoActivity = new Intent(context, MoreInfoActivity.class);
+                moreInfoActivity.putExtra("imdbID", searchResults[position][4]);
+                startActivity(moreInfoActivity);
+            }
+        });
     }
 
     public void onSearch(View view) throws IOException, JSONException {
@@ -55,15 +57,20 @@ public class MainActivity extends AppCompatActivity {
         String OMDb_API = "http://www.omdbapi.com/?";
         String title_search = "s=" +
                 URLEncoder.encode(search_input.getText().toString(), "UTF-8");
-        url = new URL(OMDb_API + title_search);
+        URL url = new URL(OMDb_API + title_search);
 
-        new readJsonFromURL().execute();
+        new readJsonSearchFromURL(url).execute();
     }
 
-    private class readJsonFromURL extends AsyncTask<Void, Void, Void> {
+    private class readJsonSearchFromURL extends AsyncTask<Void, Void, Void> {
 
+        URL url;
         JSONArray search;
         String toast_string;
+
+        private readJsonSearchFromURL(URL url) {
+            this.url = url;
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -97,17 +104,20 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void result) {
 
             if (search != null) {
-                String[] titles = new String[10];
                 for (int i = 0; i < search.length(); i++) {
                     try {
-                        JSONObject search_result = search.getJSONObject(i);
-                        titles[i] = search_result.getString("Title");
+                        JSONObject searchResult = search.getJSONObject(i);
+                        searchResults[i][0] = searchResult.getString("Title");
+                        searchResults[i][1] = searchResult.getString("Type");
+                        searchResults[i][2] = searchResult.getString("Year");
+                        searchResults[1][3] = searchResult.getString("Poster");
+                        searchResults[i][4] = searchResult.getString("imdbID");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-                mAdapter = new MyAdapter(titles);
-                mRecyclerView.setAdapter(mAdapter);
+                ListAdapter adapter = new MyAdapter(context, searchResults);
+                movie_list.setAdapter(adapter);
 
             } else {
                     Toast.makeText(getApplicationContext(), toast_string,
@@ -116,6 +126,6 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(result);
         }
 
-
     }
+
 }

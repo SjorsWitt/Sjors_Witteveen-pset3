@@ -1,5 +1,6 @@
 package com.example.sjors.sjors_witteveen_pset3;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -40,6 +42,8 @@ public class MoreInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.more_info_activity);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         movie_poster = (ImageView) findViewById(R.id.movie_poster);
         movie_title = (TextView) findViewById(R.id.movie_title);
         movie_year = (TextView) findViewById(R.id.movie_year);
@@ -67,11 +71,16 @@ public class MoreInfoActivity extends AppCompatActivity {
         new readJsonMovieInfo(url).execute();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return super.onOptionsItemSelected(item);
+    }
+
     private class readJsonMovieInfo extends AsyncTask<Void, Void, Void> {
 
         URL url;
         JSONObject jsonMovieInfo;
-        String[] movieInfo = new String[12];
 
         private readJsonMovieInfo(URL url) {
             this.url = url;

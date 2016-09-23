@@ -5,11 +5,14 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -17,6 +20,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Scanner;
@@ -25,17 +30,28 @@ public class MainActivity extends AppCompatActivity {
 
     Context context = this;
 
-    EditText search_input;
+    EditText search_bar;
 
     private ListView movie_list;
-    private String[][] searchResults = new String[10][5];
+    private String[][] searchResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        search_input = (EditText) findViewById(R.id.search_input);
+        search_bar = (EditText) findViewById(R.id.search_bar);
+        search_bar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    onSearch();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         movie_list = (ListView) findViewById(R.id.movie_list);
 
         movie_list.setOnItemClickListener(
@@ -51,13 +67,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void onSearch(View view) throws IOException, JSONException {
+    public void onSearch() {
 
         // build a URL
         String OMDb_API = "http://www.omdbapi.com/?";
-        String title_search = "s=" +
-                URLEncoder.encode(search_input.getText().toString(), "UTF-8");
-        URL url = new URL(OMDb_API + title_search);
+        String title_search = null;
+        URL url = null;
+        try {
+            title_search = "s=" +
+                    URLEncoder.encode(search_bar.getText().toString(), "UTF-8");
+            url = new URL(OMDb_API + title_search);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         new readJsonSearchFromURL(url).execute();
     }
@@ -104,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void result) {
 
             if (search != null) {
+                searchResults = new String[search.length()][5];
                 for (int i = 0; i < search.length(); i++) {
                     try {
                         JSONObject searchResult = search.getJSONObject(i);

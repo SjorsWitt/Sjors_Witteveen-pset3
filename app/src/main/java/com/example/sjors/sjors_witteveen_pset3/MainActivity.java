@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                                     View view, int position, long id) {
 
                 Intent moreInfoActivity = new Intent(context, MoreInfoActivity.class);
-                moreInfoActivity.putExtra("imdbID", searchResults[position][4]);
+                moreInfoActivity.putExtra("imdbID", searchResults[position][3]);
                 startActivity(moreInfoActivity);
             }
         });
@@ -99,16 +99,15 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             // read from the URL
-            Scanner scan = null;
+            String str = "";
             try {
-                scan = new Scanner(url.openStream());
+                Scanner scan = new Scanner(url.openStream());
+                while (scan.hasNext())
+                    str += scan.nextLine();
+                scan.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String str = "";
-            while (scan.hasNext())
-                str += scan.nextLine();
-            scan.close();
 
             // build a JSON object
             try {
@@ -128,15 +127,14 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void result) {
 
             if (search != null) {
-                searchResults = new String[search.length()][5];
+                searchResults = new String[search.length()][4];
                 for (int i = 0; i < search.length(); i++) {
                     try {
                         JSONObject searchResult = search.getJSONObject(i);
                         searchResults[i][0] = searchResult.getString("Title");
                         searchResults[i][1] = searchResult.getString("Type");
                         searchResults[i][2] = searchResult.getString("Year");
-                        searchResults[1][3] = searchResult.getString("Poster");
-                        searchResults[i][4] = searchResult.getString("imdbID");
+                        searchResults[i][3] = searchResult.getString("imdbID");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

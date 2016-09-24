@@ -1,17 +1,20 @@
 package com.example.sjors.sjors_witteveen_pset3;
 
-import android.app.ActionBar;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +26,8 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class MoreInfoActivity extends AppCompatActivity {
+
+    SharedPreferences pref;
 
     private ImageView movie_poster;
     private TextView movie_title;
@@ -37,10 +42,15 @@ public class MoreInfoActivity extends AppCompatActivity {
     private TextView movie_actors;
     private TextView movie_awards;
 
+    String imdbID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.more_info_activity);
+
+        pref = getApplicationContext().getSharedPreferences("imdbIDs",
+                MODE_PRIVATE);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -59,7 +69,7 @@ public class MoreInfoActivity extends AppCompatActivity {
 
         // get IMDb ID String from previous activity
         Intent intent = getIntent();
-        String imdbID = intent.getExtras().getString("imdbID");
+        imdbID = intent.getExtras().getString("imdbID");
 
         URL url = null;
         try {
@@ -72,8 +82,49 @@ public class MoreInfoActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.favorite_button, menu);
+
+        MenuItem favorite_button = menu.findItem(R.id.favorite_button);
+
+        if (pref.getBoolean(imdbID, false)) {
+            favorite_button.setIcon(ResourcesCompat.getDrawable(
+                    getResources(), R.drawable.ic_favorite_clicked, null));
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        finish();
+
+        // if favorite button is pressed
+        if (item.getItemId() == R.id.favorite_button) {
+            SharedPreferences.Editor editor = pref.edit();
+
+            if (pref.getBoolean(imdbID, false)) {
+                editor.remove(imdbID);
+
+                item.setIcon(ResourcesCompat.getDrawable(
+                        getResources(), R.drawable.ic_favorite_unclicked, null));
+                Toast.makeText(getApplicationContext(),
+                        "Removed from your watch list!", Toast.LENGTH_SHORT).show();
+
+            } else {
+                editor.putBoolean(imdbID, true);
+
+                item.setIcon(ResourcesCompat.getDrawable(
+                        getResources(), R.drawable.ic_favorite_clicked, null));
+                Toast.makeText(getApplicationContext(),
+                        "Added to your watch list!", Toast.LENGTH_SHORT).show();
+            }
+            editor.apply();
+
+        // if back button is pressed
+        } else {
+            finish();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

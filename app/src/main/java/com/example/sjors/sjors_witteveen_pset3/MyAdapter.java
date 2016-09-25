@@ -18,6 +18,7 @@ public class MyAdapter extends ArrayAdapter<String[]> {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View view = inflater.inflate(R.layout.list_item, parent, false);
 
+        // adjust item layout TextViews to search result
         String[] searchResult = getItem(position);
         String typeAndYearString = searchResult[1] + " ("
                 + searchResult[2] + ")";

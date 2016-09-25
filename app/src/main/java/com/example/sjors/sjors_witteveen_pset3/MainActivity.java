@@ -28,10 +28,9 @@ import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
-    Context context = this;
+    private Context context = this;
 
-    EditText search_bar;
-
+    private EditText search_bar;
     private ListView movie_list;
     private String[][] searchResults;
 
@@ -41,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         search_bar = (EditText) findViewById(R.id.search_bar);
+
+        // when search button in keyboard is clicked
         search_bar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -52,21 +53,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // movie results list with OnItemClickListener
         movie_list = (ListView) findViewById(R.id.movie_list);
-
         movie_list.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent,
                                     View view, int position, long id) {
 
-                Intent moreInfoActivity = new Intent(context, MoreInfoActivity.class);
-                moreInfoActivity.putExtra("imdbID", searchResults[position][3]);
+                // start activity that displays more info on the item
+                Intent moreInfoActivity = new Intent(context,
+                        MoreInfoActivity.class);
+                moreInfoActivity.putExtra("imdbID",
+                        searchResults[position][3]);
                 startActivity(moreInfoActivity);
             }
         });
     }
 
+    // when search button is clicked
     public void onSearch() {
 
         // build a URL
@@ -74,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
         String title_search = null;
         URL url = null;
         try {
-            title_search = "s=" +
-                    URLEncoder.encode(search_bar.getText().toString(), "UTF-8");
+            title_search = "s=" + URLEncoder.encode(
+                    search_bar.getText().toString(), "UTF-8");
             url = new URL(OMDb_API + title_search);
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -86,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         new readJsonSearchFromURL(url).execute();
     }
 
+    // read JSON search file from URL
     private class readJsonSearchFromURL extends AsyncTask<Void, Void, Void> {
 
         URL url;
@@ -126,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
 
+            // retrieve search results info
             if (search != null) {
                 searchResults = new String[search.length()][4];
                 for (int i = 0; i < search.length(); i++) {
@@ -139,12 +146,15 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+
+                // initialize ListAdapter and set to movie_list
                 ListAdapter adapter = new MyAdapter(context, searchResults);
                 movie_list.setAdapter(adapter);
 
             } else {
-                    Toast.makeText(getApplicationContext(), toast_string,
-                            Toast.LENGTH_SHORT).show();
+                // display OMDb error message
+                Toast.makeText(getApplicationContext(), toast_string,
+                        Toast.LENGTH_SHORT).show();
             }
             super.onPostExecute(result);
         }

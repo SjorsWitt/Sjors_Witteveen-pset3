@@ -27,7 +27,7 @@ import java.util.Scanner;
 
 public class MoreInfoActivity extends AppCompatActivity {
 
-    SharedPreferences pref;
+    private SharedPreferences pref;
 
     private ImageView movie_poster;
     private TextView movie_title;
@@ -42,7 +42,8 @@ public class MoreInfoActivity extends AppCompatActivity {
     private TextView movie_actors;
     private TextView movie_awards;
 
-    String imdbID;
+    // IMDb id of the item opened in this activity
+    private String imdbID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +53,10 @@ public class MoreInfoActivity extends AppCompatActivity {
         pref = getApplicationContext().getSharedPreferences("imdbIDs",
                 MODE_PRIVATE);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // display up navigation button
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         movie_poster = (ImageView) findViewById(R.id.movie_poster);
         movie_title = (TextView) findViewById(R.id.movie_title);
@@ -71,22 +75,24 @@ public class MoreInfoActivity extends AppCompatActivity {
         Intent intent = getIntent();
         imdbID = intent.getExtras().getString("imdbID");
 
+        // look up more info on IMDb item
         URL url = null;
         try {
             url = new URL("http://www.omdbapi.com/?i=" + imdbID);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
-        new readJsonMovieInfo(url).execute();
+        new readJsonItemInfo(url).execute();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // add favorite button (star icon) to action bar
         getMenuInflater().inflate(R.menu.favorite_button, menu);
 
         MenuItem favorite_button = menu.findItem(R.id.favorite_button);
 
+        // if item is already added to watch list, display filled star icon
         if (pref.getBoolean(imdbID, false)) {
             favorite_button.setIcon(ResourcesCompat.getDrawable(
                     getResources(), R.drawable.ic_favorite_clicked, null));
@@ -102,21 +108,25 @@ public class MoreInfoActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.favorite_button) {
             SharedPreferences.Editor editor = pref.edit();
 
+            // if item is already on watch list
             if (pref.getBoolean(imdbID, false)) {
                 editor.remove(imdbID);
 
-                item.setIcon(ResourcesCompat.getDrawable(
-                        getResources(), R.drawable.ic_favorite_unclicked, null));
+                item.setIcon(ResourcesCompat.getDrawable(getResources(),
+                        R.drawable.ic_favorite_unclicked, null));
                 Toast.makeText(getApplicationContext(),
-                        "Removed from your watch list!", Toast.LENGTH_SHORT).show();
+                        "Removed from your watch list!", Toast.LENGTH_SHORT)
+                        .show();
 
+            // if item is not on watch list
             } else {
                 editor.putBoolean(imdbID, true);
 
                 item.setIcon(ResourcesCompat.getDrawable(
                         getResources(), R.drawable.ic_favorite_clicked, null));
                 Toast.makeText(getApplicationContext(),
-                        "Added to your watch list!", Toast.LENGTH_SHORT).show();
+                        "Added to your watch list!", Toast.LENGTH_SHORT)
+                        .show();
             }
             editor.apply();
 
@@ -128,28 +138,28 @@ public class MoreInfoActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class readJsonMovieInfo extends AsyncTask<Void, Void, Void> {
+    private class readJsonItemInfo extends AsyncTask<Void, Void, Void> {
 
         URL url;
         JSONObject jsonMovieInfo;
 
-        private readJsonMovieInfo(URL url) {
+        private readJsonItemInfo(URL url) {
             this.url = url;
         }
 
         @Override
         protected Void doInBackground(Void... params) {
+
             // read from the URL
-            Scanner scan = null;
+            String str = "";
             try {
-                scan = new Scanner(url.openStream());
+                Scanner scan = new Scanner(url.openStream());
+                while (scan.hasNext())
+                    str += scan.nextLine();
+                scan.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String str = "";
-            while (scan.hasNext())
-                str += scan.nextLine();
-            scan.close();
 
             // build a JSON object
             try {
@@ -163,8 +173,8 @@ public class MoreInfoActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
 
+            // retrieve JSON item info
             if (jsonMovieInfo != null) {
-
                 String urlString = "";
                 try {
                     urlString = jsonMovieInfo.getString("Poster");
@@ -214,6 +224,7 @@ public class MoreInfoActivity extends AppCompatActivity {
 
     }
 
+    // Image download task
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImage;
 

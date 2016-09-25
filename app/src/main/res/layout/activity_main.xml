@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/search_bar"
-        android:hint="@string/title"
+        android:hint="@string/search_hint"
         android:imeOptions="actionSearch"
         android:inputType="text"
         android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -22,7 +22,7 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/movie_list">
+        android:id="@+id/item_list">
     </ListView>
 
 </LinearLayout>

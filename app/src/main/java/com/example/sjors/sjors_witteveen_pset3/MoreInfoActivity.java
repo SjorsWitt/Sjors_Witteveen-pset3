@@ -31,7 +31,7 @@ public class MoreInfoActivity extends AppCompatActivity {
 
     private ImageView movie_poster;
     private TextView movie_title;
-    private TextView movie_year;
+    private TextView movie_type_year;
     private TextView movie_released;
     private TextView movie_genre;
     private TextView movie_runtime;
@@ -60,7 +60,7 @@ public class MoreInfoActivity extends AppCompatActivity {
 
         movie_poster = (ImageView) findViewById(R.id.movie_poster);
         movie_title = (TextView) findViewById(R.id.movie_title);
-        movie_year = (TextView) findViewById(R.id.movie_year);
+        movie_type_year = (TextView) findViewById(R.id.movie_type_year);
         movie_released = (TextView) findViewById(R.id.movie_released);
         movie_genre = (TextView) findViewById(R.id.movie_genre);
         movie_runtime = (TextView) findViewById(R.id.movie_runtime);
@@ -96,6 +96,7 @@ public class MoreInfoActivity extends AppCompatActivity {
         if (pref.getBoolean(imdbID, false)) {
             favorite_button.setIcon(ResourcesCompat.getDrawable(
                     getResources(), R.drawable.ic_favorite_clicked, null));
+            favorite_button.setTitle("Remove from your watch list.");
         }
 
         return true;
@@ -118,6 +119,8 @@ public class MoreInfoActivity extends AppCompatActivity {
                         "Removed from your watch list!", Toast.LENGTH_SHORT)
                         .show();
 
+                item.setTitle("Add to your watch list.");
+
             // if item is not on watch list
             } else {
                 editor.putBoolean(imdbID, true);
@@ -127,6 +130,8 @@ public class MoreInfoActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),
                         "Added to your watch list!", Toast.LENGTH_SHORT)
                         .show();
+
+                item.setTitle("Remove from your watch list.");
             }
             editor.apply();
 
@@ -181,8 +186,9 @@ public class MoreInfoActivity extends AppCompatActivity {
 
                     movie_title.setText(jsonMovieInfo.getString("Title"));
 
-                    String year = "(" + jsonMovieInfo.getString("Year") + ")";
-                    movie_year.setText(year);
+                    String typeAndYear = jsonMovieInfo.getString("Type") +
+                            " (" + jsonMovieInfo.getString("Year") + ")";
+                    movie_type_year.setText(typeAndYear);
                     movie_released.setText(
                             jsonMovieInfo.getString("Released"));
                     movie_genre.setText(jsonMovieInfo.getString("Genre"));

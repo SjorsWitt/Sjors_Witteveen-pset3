@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">Watch List</string>
-    <string name="title">Title</string>
+    <string name="search_hint">Search for new titles…</string>
     <string name="search">Search</string>
     <string name="no_results_found">No results found</string>
     <string name="movie_poster">Movie poster</string>
-    <string name="action_favorite_clicked">Added to your watch list!</string>
+    <string name="action_favorite_clicked">Add to your watch list.</string>
+    <string name="action_favorites_clicked">Open your watch list.</string>
 </resources>

@@ -25,7 +25,6 @@
                 android:layout_height="220dp"
                 android:contentDescription="@string/movie_poster"
                 android:id="@+id/movie_poster"
-                android:src="@mipmap/ic_launcher"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"/>
@@ -42,48 +41,42 @@
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:singleLine="true"
-                    android:layout_weight="1"
-                    android:text="The Dark Knight" />
+                    android:layout_weight="1" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:id="@+id/movie_year"
+                    android:id="@+id/movie_type_year"
                     android:textSize="16sp"
-                    android:layout_weight="1"
-                    android:text="(2008)" />
+                    android:layout_weight="1" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:id="@+id/movie_released"
                     android:textSize="16sp"
-                    android:layout_weight="1"
-                    android:text="21 september 2008" />
+                    android:layout_weight="1" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:id="@+id/movie_genre"
                     android:textSize="16sp"
-                    android:layout_weight="1"
-                    android:text="Action, Crime, Drama"/>
+                    android:layout_weight="1" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:id="@+id/movie_runtime"
                     android:textSize="16sp"
-                    android:layout_weight="1"
-                    android:text="152 min"/>
+                    android:layout_weight="1" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:id="@+id/movie_imdb_rating"
                     android:textSize="16sp"
-                    android:layout_weight="1"
-                    android:text="IMDb Rating: 9.0"/>
+                    android:layout_weight="1" />
 
             </LinearLayout>
 
@@ -93,35 +86,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/movie_plot"
-            android:paddingBottom="5dp"
-            android:text="When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, the caped crusader must come to terms with one of the greatest psychological tests of his ability to fight injustice."/>
+            android:paddingBottom="5dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/movie_director"
-            android:paddingBottom="5dp"
-            android:text="Director: Christopher Nolan"/>
+            android:paddingBottom="5dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/movie_writer"
-            android:paddingBottom="5dp"
-            android:text="Writer: Jonathan Nolan (screenplay), Christopher Nolan (screenplay), Christopher Nolan (story), David S. Goyer (story), Bob Kane (characters)"/>
+            android:paddingBottom="5dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/movie_actors"
-            android:paddingBottom="5dp"
-            android:text="Actors: Christian Bale, Heath Ledger, Aaron Eckhart, Michael Caine"/>
+            android:paddingBottom="5dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/movie_awards"
-            android:text="Awards: Won 2 Oscars. Another 146 wins and 142 nominations."/>
+            android:id="@+id/movie_awards"/>
 
     </LinearLayout>
 

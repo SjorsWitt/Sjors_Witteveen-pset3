@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+        updateListView();
     }
 
     // when search button is clicked

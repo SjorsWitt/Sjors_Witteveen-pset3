@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
     // displays watch list with added items
     private void displayWatchList() {
+        search_bar.getText().clear();
 
         // creates ArrayList with all saved IMDb IDs
         ArrayList<String> allSavedIDs = new ArrayList<>();
